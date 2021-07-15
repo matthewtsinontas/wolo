@@ -1,5 +1,5 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs');
+const puppeteer = require('puppeteer');
 const Parser = require('node-html-parser');
 
 const name = 'FishyFred';
@@ -12,9 +12,8 @@ const tag = 'bait';
   const page = await browser.newPage();
   await page.goto(`https://tracker.gg/valorant/profile/riot/${name}%23${tag}/matches`);
   await page.waitForSelector('.trn-gamereport-list');
-  const matchGroupTitle = await page.$('.trn-gamereport-list__group h3');
-  const mostRecentTitle = await matchGroupTitle.evaluate(node => node.innerText);
-  if (mostRecentTitle.includes('Today')) {
+  const title = await (await page.$('.trn-gamereport-list__group h3')).evaluate(node => node.innerText);
+  if (title.includes('Today')) {
     const todayGames = await page.$('.trn-gamereport-list__group-entries');
     const data = await todayGames.evaluate(node => node.innerHTML);
     Parser.parse(data).childNodes.forEach(node => {
@@ -22,5 +21,5 @@ const tag = 'bait';
     });
   }
   await browser.close();
-  fs.writeFileSync('wolo.txt', `W${wins}L${losses}`);
+  fs.writeFileSync('wolo.txt', `W ${wins} L ${losses}`);
 })();
